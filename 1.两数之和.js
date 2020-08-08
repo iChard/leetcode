@@ -11,15 +11,24 @@
  * @return {number[]}
  */
 var twoSum = function (nums, target) {
-    let arr = [];
-    for (let index in nums) {
-        if (nums.includes(target - nums[index])) {
-            arr.push(Number(index), nums.indexOf(target - nums[index]));
-            return arr;
-        }
+    let len = nums.length;
+    let loop = len - 1;
+    let item;
+    if (len == 2) {
+        return [0, 1]
     }
-    return arr;
+    while (loop > 1) {
+        item = nums.pop();
+        dis = target - item;
+        if (nums.indexOf(dis) !== -1) {
+            return [nums.indexOf(dis), loop]
+        }
+        loop--;
+    }
+    return [0, 1];
 };
-twoSum([2, 7, 11, 15], 9)
+// twoSum([2, 7, 11, 15], 9)
+console.log(twoSum([2, 7, 11, 15], 9))
 // @lc code=end
+
 
