@@ -11,7 +11,7 @@
             "request": "launch",
             "name": "Launch Program",
             "skipFiles": [
-                "<node_internals>/index.js"
+                "<node_internals>/数据结构/BinarySearchTree.js"
             ],
             "program": "${file}",
             "cwd": ""
