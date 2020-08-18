@@ -1,17 +1,23 @@
-// let obj
-// 翻转链表
-function reverseList(head) {
-    let prev = null
-    let curr = head
-    while (curr) {
-        let temp = curr.next;
-        curr.next = prev
-        prev = curr
-        curr = temp
-    }
-    return curr
-}
+/*
+ * @lc app=leetcode.cn id=92 lang=javascript
+ *
+ * [92] 反转链表 II
+ */
 
+// @lc code=start
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @param {number} m
+ * @param {number} n
+ * @return {ListNode}
+ */
 // 翻转链表指定元素
 // [1,2,3,4,5,6,7,8,9] m: 3 n:7==>[1,2,7,6,5,4,3,8,9]
 function reverseBetween(head, m, n) {
@@ -23,7 +29,7 @@ function reverseBetween(head, m, n) {
     }
     let curr = tempHead.next//3,4,5,6,7,8,9
     let prev = null
-    for (let i = 1; i <= n - m; i++) {
+    for (let i = 0; i <= n - m; i++) {
         let temp = curr.next;
         curr.next = prev
         prev = curr//7
@@ -34,3 +40,5 @@ function reverseBetween(head, m, n) {
     tempHead.next = prev
     return dummy.next
 }
+// @lc code=end
+

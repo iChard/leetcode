@@ -20,30 +20,30 @@ class Graph {
     }
 
     toString() {
-        return this.vertices.reduce((r, v, i) => {
-            return this.adjList.get(v).reduce((r, w, i) => {
+        return this.vertices.reduce((r, v) => {
+            return this.adjList.get(v).reduce((r, w) => {
                 return r + `${w} `
             }, `${r}\n${v} => `)
         }, '')
     }
 
-    // breadth first search BFS
-    bfs(v, cb) {
-        const read = []
-        const distances = {}
-        const predecessors = {}
-        const adjList = this.adjList
-        let pending = [v || this.vertices[0]]
+    // breadth first search BFS，队列
+    bfs(v, cb) {// 待查顶点：v
+        const read = []// 已读节点
+        let pending = [v || this.vertices[0]]// 待读节点
+        const distances = {}// 各节点距离顶点的距离
+        const predecessors = {}// 前任节点
+        const adjList = this.adjList// 每个节点的边集合
         const readVertices = vertices => {
-            vertices.forEach(key => {
-                read.push(key)
-                pending.shift()
-                distances[key] = distances[key] || 0
+            vertices.forEach(key => {// key：上级节点
+                read.push(key)// 遍历&&存储已读节点
+                pending.shift()// 使用队列形式，依次读取最接近顶点的节点
+                distances[key] = distances[key] || 0// key节点距离顶点的距离：初始化为0(遍历一层加1)
                 predecessors[key] = predecessors[key] || null
                 adjList.get(key).forEach(v => {
                     if (!pending.includes(v) && !read.includes(v)) {
-                        pending.push(v)
-                        distances[v] = distances[key] + 1
+                        pending.push(v)// 将第一层节点存入待读节点
+                        distances[v] = distances[key] + 1// 
                         predecessors[v] = key
                     }
                 })
@@ -57,14 +57,15 @@ class Graph {
         return { distances, predecessors }
     }
 
+    // 寻找目标节点和其他节点的边， fromVertex：目标节点
     distance(fromVertex) {
         const vertices = this.vertices
-        const { distances, predecessors } = this.bfs(fromVertex)
+        const { distances, predecessors } = this.bfs(fromVertex)// 当前节点和其他节点的距离以及通过当前节点计算的每一个节点的上级节点
         vertices.forEach(toVertex => {
-            if (!!distances[toVertex]) {
-                let preVertex = predecessors[toVertex]
+            if (!!distances[toVertex]) {//不是当前节点（即与fromVertex节点存在距离）
+                let preVertex = predecessors[toVertex]//找到当前节点的父节点
                 let slug = ''
-                while (fromVertex !== preVertex) {
+                while (fromVertex !== preVertex) {// 当父级节点未前溯到节点本身时，则一直添加线
                     slug = `${preVertex} -> ${slug}`
                     preVertex = predecessors[preVertex]
                 }
@@ -74,18 +75,18 @@ class Graph {
         })
     }
 
-    // depth first search
+    // depth first search DFS, 栈
     dfs(callback) {
         let readTimer = 0
-        const read = []
-        const readTimes = []
-        const finishedTimes = []
-        const predecessors = []
-        const adjList = this.adjList
-        const readVertices = (vertices, predecessor) => {
-            vertices.forEach(key => {
+        const read = [] //已读节点
+        const readTimes = {}// 每个节点是被发现所用的时间
+        const finishedTimes = {}// 每个节点写入到read时用的时间（即利用完所用的时间）
+        const predecessors = {}// 当前顺序便利时各个节点的上级节点
+        const adjList = this.adjList// 边
+        const readVertices = (vertices, predecessor) => {// predecessor: 上级节点
+            vertices.forEach((key, loopTimes) => {
                 readTimer++
-                if (adjList.get(key).every(v => read.includes(v)) && !finishedTimes[key]) {
+                if (adjList.get(key).every(v => read.includes(v)) && !finishedTimes[key]) {//当前节点的每个相邻节点均已读且
                     finishedTimes[key] = readTimer
                 }
                 if (read.includes(key)) return false
@@ -94,12 +95,12 @@ class Graph {
                 if (callback) callback(key)
                 predecessors[key] = predecessors[key] || predecessor || null
                 if (read.length !== this.vertices.length) {
-                    readVertices(adjList.get(key), key)
+                    readVertices(adjList.get(key), key)// 这里的key就是下一次遍历节点的上级节点
                 }
             })
         }
         readVertices(adjList.keys)
-        return { readTimes, finishedTimes, predecessors }
+        return { readTimer, read, readTimes, finishedTimes, predecessors }
     }
 }
 
@@ -118,23 +119,15 @@ graph.addEdge('D', 'H')
 graph.addEdge('B', 'E')
 graph.addEdge('B', 'F')
 graph.addEdge('E', 'I')
+console.log('vertices:', graph.vertices)
+console.log('adjList:', graph.adjList)
 
-console.log(graph.toString())
-let res = graph.bfs(graph.vertices[0], v => console.log('Visited vertices:', v))
-console.log(res)
-graph.distance(graph.vertices[0])
+// console.log(graph.toString())
+let res = graph.bfs(graph.vertices[0], v => {
+    // console.log('Visited vertices:', v)
+})
+// console.log('res:', res)
+// graph.distance(graph.vertices[0])
 // console.log(graph.adjList)
-let _res = graph.dfs(v => console.log(v))
-
-// 输出
-/*
-A => B C D
-B => A E F
-C => A D G
-D => A C G H
-E => B I
-F => B
-G => C D
-H => D
-I => E
-*/
+let _res = graph.dfs()
+console.log('dfs res:', _res)
